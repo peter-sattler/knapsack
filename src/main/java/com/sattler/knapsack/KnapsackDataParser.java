@@ -8,9 +8,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
-
 import com.sattler.knapsack.Knapsack.Item;
 
 /**
@@ -18,12 +15,12 @@ import com.sattler.knapsack.Knapsack.Item;
  * <p/>
  * Parses knapsack data, each line formatted as follows:
  * <ul>
- * <li>The weight that a package can take (before the colon)</li>
+ * <li>The maximum weight (in pounds) that the knapsack can hold (before the colon)</li>
  * <li>The list of items you need to pick from. Each item is enclosed in parentheses where:
  * <ol>
- * <li>Is an item's index number</li>
- * <li>Its weight</li>
- * <li>Its cost</li>
+ * <li>Item's unique identifier</li>
+ * <li>Its weight (in lbs.)</li>
+ * <li>Its cost (in USD)</li>
  * </ol>
  * </ul>
  * 
@@ -65,10 +62,10 @@ public final class KnapsackDataParser {
             final String[] splitData = ITEM_COMPONENT_PATTERN.split(item.replaceAll(ITEM_LIST_REPLACEMENT_CHARS, ""));
             if (splitData.length != 3)
                 throw new IllegalArgumentException("Item components have incorrect format");
-            final int number = Integer.parseInt(splitData[0]);
+            final int id = Integer.parseInt(splitData[0]);
             final BigDecimal weight = new BigDecimal(splitData[1]);
             final int cost = Integer.parseInt(splitData[2]);
-            itemList.add(new Item(number, weight, cost));
+            itemList.add(new Item(id, weight, cost));
         }
         return new KnapsackParameter(capacity, itemList);
     }
@@ -97,7 +94,7 @@ public final class KnapsackDataParser {
 
         @Override
         public String toString() {
-            return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+            return String.format("%s [capacity=%s, items=%s]", getClass().getSimpleName(), capacity, Arrays.toString(items));
         }
     }
 }
