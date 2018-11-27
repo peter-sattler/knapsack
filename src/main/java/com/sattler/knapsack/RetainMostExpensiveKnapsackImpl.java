@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
  * An immutable knapsack to retain the most expensive items possible
  * 
  * @author Pete Sattler
+ * @version November 2018
  */
 public final class RetainMostExpensiveKnapsackImpl implements Knapsack, Serializable {
 
@@ -39,9 +40,9 @@ public final class RetainMostExpensiveKnapsackImpl implements Knapsack, Serializ
 
     @Override
     public boolean add(Item newItem) {
-        if (newItem.getWeight().compareTo(capacity) <= 0) {
+        if (newItem.getWeight().compareTo(BigDecimal.ZERO) > 0 && newItem.getWeight().compareTo(capacity) <= 0) {
             if (!items.contains(newItem)) {
-                // Free up capacity by removing items with a lower cost than the new item:
+                //Free up capacity by removing items with a lower cost than the new item:
                 while (!hasEnoughCapacity(newItem)) {
                     final Item peekItem = items.peek();
                     if (peekItem != null && peekItem.getCost() < newItem.getCost()) {
@@ -69,7 +70,7 @@ public final class RetainMostExpensiveKnapsackImpl implements Knapsack, Serializ
      */
     private boolean hasEnoughCapacity(Item newItem) {
         final BigDecimal usedCapacity = newItem.getWeight().add(items.stream().map(Item::getWeight).reduce(BigDecimal.ZERO, BigDecimal::add));
-        return usedCapacity.compareTo(capacity) > 0;
+        return usedCapacity.compareTo(capacity) <= 0;
     }
 
     @Override

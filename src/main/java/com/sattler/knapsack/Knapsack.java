@@ -8,6 +8,7 @@ import java.util.Objects;
  * A knapsack capable of holding immutable items
  * 
  * @author Pete Sattler
+ * @version November 2018
  */
 public interface Knapsack {
 
@@ -21,7 +22,8 @@ public interface Knapsack {
     /**
      * Add a new item
      * 
-     * @param newItem The new item to add. If the knapsack doesn't have enough capacity, then the items will be removed according to implementation specific requirements.
+     * @param newItem The new item to add. If the knapsack doesn't have enough capacity, then 
+     *                one or more items will be removed according to the specific implementation.
      * @return True if the item was added to the knapsack. Otherwise, returns false.
      */
     boolean add(Item newItem);
@@ -46,7 +48,7 @@ public interface Knapsack {
         /**
          * Knapsack item with ZERO weight and ZERO cost
          */
-        public static final Item ZERO_ITEM = new Item(-1, BigDecimal.ZERO, 0);
+        public static final Item ZERO_ITEM = new Item(0, BigDecimal.ZERO, 0);
 
         /**
          * Constructs a new knapsack item
@@ -61,6 +63,16 @@ public interface Knapsack {
             this.cost = cost;
         }
 
+        /**
+         * Add two items together
+         * 
+         * @param that The second item
+         * @return A new item with this items's ID and the combined weight and the combined cost of both items.
+         */
+        public Item add(Item that) {
+            return new Item(this.id, this.weight.add(that.weight), this.cost + that.cost);
+        }
+
         public int getId() {
             return id;
         }
@@ -71,13 +83,6 @@ public interface Knapsack {
 
         public int getCost() {
             return cost;
-        }
-
-        /**
-         * Find the most expensive item
-         */
-        public static Item findMostExpensive(Item item1, Item item2) {
-            return (item1.cost > item2.cost) ? item1 : item2;
         }
 
         @Override

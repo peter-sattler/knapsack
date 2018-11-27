@@ -25,6 +25,7 @@ import com.sattler.knapsack.Knapsack.Item;
  * </ul>
  * 
  * @author Pete Sattler
+ * @version November 2018
  */
 public final class KnapsackDataParser {
 

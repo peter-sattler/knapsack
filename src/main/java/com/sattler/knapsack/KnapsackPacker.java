@@ -6,6 +6,7 @@ import com.sattler.knapsack.Knapsack.Item;
  * A knapsack item packer
  * 
  * @author Pete Sattler
+ * @version November 2018
  */
 public interface KnapsackPacker {
 

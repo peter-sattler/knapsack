@@ -1,13 +1,17 @@
 package com.sattler.knapsack;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
+import static org.junit.Assert.assertThat;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.sattler.knapsack.Knapsack.Item;
 import com.sattler.knapsack.KnapsackDataParser.KnapsackParameter;
 
 /**
@@ -46,44 +50,56 @@ import com.sattler.knapsack.KnapsackDataParser.KnapsackParameter;
  * </ol>
  * 
  * @author Pete Sattler
+ * @version November 2018
  */
-public class KnapsackUnitTestHarness {
+public final class KnapsackUnitTestHarness {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KnapsackUnitTestHarness.class);
+    private static final String WHOLE_ITEM_RECURSIVE_ALGORITHM = "whole item recursive";
 
+    @Test
+    public void knapsackWebsiteTestCase() {
+        final String unparsedData = "7 : (1,2,$1) (2,3,$2) (3,3,$5) (4,4,$9)";
+        checkAssertionsImpl(unparsedData, new Integer[] { 3, 4 });
+    }
+    
     @Test
     public void knapsackWholeItemPackerSingleItemTestCase() {
         final String unparsedData = "81 : (1,53.38,$45) (2,88.62,$98) (3,78.48,$3) (4,72.30,$76) (5,30.18,$9) (6,46.34,$48)";
-        final int[] expected = new int[] { 4 };
-        final int[] actual = knapsackImpl(unparsedData);
-        assertArrayEquals(expected, actual);
+        checkAssertionsImpl(unparsedData, new Integer[] { 4 });
     }
 
     @Test
     public void knapsackWholeItemPackerMultipleItemsTestCase() {
         final String unparsedData = "75 : (1,85.31,$29) (2,14.55,$74) (3,3.98,$16) (4,26.24,$55) (5,63.69,$52) (6,76.25,$75) (7,60.02,$74) (8,93.18,$35) (9,89.95,$78)";
-        final int[] expected = new int[] { 2, 7 };
-        final int[] actual = knapsackImpl(unparsedData);
-        assertArrayEquals(expected, actual);
+        checkAssertionsImpl(unparsedData, new Integer[] { 2, 7 });
     }
 
-    private int[] knapsackImpl(final String unparsedData) {
+    private void checkAssertionsImpl(String unparsedData, Integer[] expected) {
+        final List<Integer> actual = executeKnapsackAlgorithmImpl(WHOLE_ITEM_RECURSIVE_ALGORITHM, unparsedData);
+        assertThat(actual, containsInAnyOrder(expected));
+    }
+
+    private List<Integer> executeKnapsackAlgorithmImpl(String algorithmName, String unparsedData) {
         final KnapsackDataParser parser = new KnapsackDataParser(unparsedData);
         final KnapsackParameter dataParm = parser.parse();
-        final RetainMostExpensiveKnapsackImpl knapsack = new RetainMostExpensiveKnapsackImpl(dataParm.getCapacity());
-        final KnapsackWholeItemRecursivePackerImpl knapsackPacker = new KnapsackWholeItemRecursivePackerImpl(knapsack);
+        final Knapsack knapsack = new RetainMostExpensiveKnapsackImpl(dataParm.getCapacity());
+        final KnapsackPacker knapsackPacker = new KnapsackWholeItemRecursivePackerImpl(knapsack);
+        LOGGER.info("Knapsack capacity: {} lbs.", knapsack.getCapacity());
+        for (Item item : dataParm.getItems())
+            LOGGER.info("Incoming item #{} weighs {} lbs. and costs ${}", item.getId(), item.getWeight(), item.getCost());
         final Knapsack packedKnapsack = knapsackPacker.pack(dataParm.getItems());
-        final int[] items = packedKnapsack.getItems();
-        switch (items.length) {
+        final int[] packedItems = packedKnapsack.getItems();
+        switch (packedItems.length) {
             case 0:
-                LOGGER.warn("Knapsack recursive algorithm did not find any items");
+                LOGGER.warn(String.format("Knapsack %s algorithm did not find any items", algorithmName));
                 break;
             case 1:
-                LOGGER.info("Knapsack recursive algorithm selects item [{}]", items[0]);
+                LOGGER.info(String.format("Knapsack %s algorithm selects item [%s]", algorithmName, packedItems[0]));
                 break;
             default:
-                LOGGER.info("Knapsack recursive algorithm selects items {}", Arrays.toString(items));
+                LOGGER.info(String.format("Knapsack %s algorithm selects items %s", algorithmName, Arrays.toString(packedItems)));
         }
-        return items;
+        return Arrays.stream(packedItems).boxed().collect(Collectors.toList());
     }
 }
