@@ -16,10 +16,10 @@ import org.slf4j.LoggerFactory;
  * @author Pete Sattler
  * @version November 2018
  */
-public final class RetainMostExpensiveKnapsackImpl implements Knapsack, Serializable {
+public final class KnapsackRetainMostExpensiveImpl implements Knapsack, Serializable {
 
     private static final long serialVersionUID = 1219933700555470834L;
-    private static final Logger LOGGER = LoggerFactory.getLogger(RetainMostExpensiveKnapsackImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(KnapsackRetainMostExpensiveImpl.class);
     private static final Comparator<Item> LOWEST_COST_ITEM = Comparator.comparingInt(Item::getCost);
     private final BigDecimal capacity;
     private final PriorityBlockingQueue<Item> items = new PriorityBlockingQueue<>(11, LOWEST_COST_ITEM);
@@ -29,7 +29,7 @@ public final class RetainMostExpensiveKnapsackImpl implements Knapsack, Serializ
      * 
      * @param capacity The maximum weight (in pounds) that the knapsack can hold
      */
-    public RetainMostExpensiveKnapsackImpl(BigDecimal capacity) {
+    public KnapsackRetainMostExpensiveImpl(BigDecimal capacity) {
         this.capacity = capacity;
     }
 
@@ -91,7 +91,7 @@ public final class RetainMostExpensiveKnapsackImpl implements Knapsack, Serializ
             return false;
         if (this.getClass() != other.getClass())
             return false;
-        final RetainMostExpensiveKnapsackImpl that = (RetainMostExpensiveKnapsackImpl) other;
+        final KnapsackRetainMostExpensiveImpl that = (KnapsackRetainMostExpensiveImpl) other;
         return Objects.equals(this.capacity, that.capacity) && Arrays.equals(this.getItems(), that.getItems());
     }
 
