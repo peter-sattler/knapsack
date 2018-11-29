@@ -11,10 +11,21 @@ import com.sattler.knapsack.Knapsack.Item;
 public interface KnapsackPacker {
 
     /**
-     * Pack the knapsack
+     * Get knapsack
      * 
-     * @param items The items to pack
-     * @return A fully packed knapsack
+     * @return Either the packed knapsack or an empty one
      */
-    Knapsack pack(Item[] items);
+    Knapsack getKnapsack();
+
+    /**
+     * Get items
+     * 
+     * @return The items to pack
+     */
+    Item[] getItems();
+
+    /**
+     * Pack the knapsack
+     */
+    void pack();
 }
