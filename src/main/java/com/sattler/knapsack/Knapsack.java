@@ -48,7 +48,7 @@ public interface Knapsack {
         /**
          * Knapsack item with ZERO weight and ZERO cost
          */
-        public static final Item ZERO_ITEM = new Item(0, BigDecimal.ZERO, 0);
+        public static final Item ZERO = new Item(0, BigDecimal.ZERO, 0);
 
         /**
          * Constructs a new knapsack item
@@ -61,16 +61,6 @@ public interface Knapsack {
             this.id = id;
             this.weight = weight;
             this.cost = cost;
-        }
-
-        /**
-         * Add two items together
-         * 
-         * @param that The second item
-         * @return A new item with this items's ID and the combined weight and the combined cost of both items.
-         */
-        public Item add(Item that) {
-            return new Item(this.id, this.weight.add(that.weight), this.cost + that.cost);
         }
 
         public int getId() {
