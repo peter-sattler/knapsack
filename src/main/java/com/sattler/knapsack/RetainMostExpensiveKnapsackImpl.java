@@ -45,7 +45,7 @@ public final class RetainMostExpensiveKnapsackImpl implements Knapsack, Serializ
                 //Free up capacity by removing items with a lower cost than the new item:
                 while (!hasEnoughCapacity(newItem)) {
                     final Item peekItem = items.peek();
-                    if (peekItem != null && peekItem.getCost() < newItem.getCost()) {
+                    if (peekItem != null && peekItem.getCost() <= newItem.getCost()) {
                         final Item removedItem = items.remove();
                         LOGGER.info("Removed existing {}", removedItem);
                         continue;
