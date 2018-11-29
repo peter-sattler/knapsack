@@ -53,7 +53,7 @@ public final class KnapsackWholeItemRecursivePackerImpl extends KnapsackBasePack
             return packImpl(++recursionLevel, itemNbr + 1, remainingCapacity, totalCost);
         }
         //Either take the item or leave it:
-        //NOTE: The knapsack implementation handles retention of the most expensive item(s)
+        //NOTE: The knapsack implementation itself handles retention of the most expensive item(s)
         final Item leftItem = packImpl(++recursionLevel, itemNbr + 1, remainingCapacity, totalCost);
         if (knapsack.add(currentItem)) {
             LOGGER.debug("RECURSION-LEVEL={}: Current {} fits into the knapsack", recursionLevel, currentItem);
