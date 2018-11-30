@@ -1,4 +1,4 @@
-package com.sattler.knapsack;
+package net.sattler22.knapsack;
 
 import java.io.Serializable;
 import java.math.BigDecimal;

@@ -1,6 +1,4 @@
-package com.sattler.knapsack;
-
-import static com.sattler.knapsack.Knapsack.Item.ZERO_ITEM;
+package net.sattler22.knapsack;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -8,7 +6,7 @@ import java.math.BigDecimal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sattler.knapsack.Knapsack.Item;
+import net.sattler22.knapsack.Knapsack.Item;
 
 /**
  * Knapsack whole item packer implemented using simple, naive recursion. It does not allow

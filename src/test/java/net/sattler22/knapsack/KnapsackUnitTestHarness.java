@@ -1,4 +1,4 @@
-package com.sattler.knapsack;
+package net.sattler22.knapsack;
 
 import static org.hamcrest.collection.IsIterableContainingInAnyOrder.containsInAnyOrder;
 import static org.junit.Assert.assertThat;
@@ -14,8 +14,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.sattler.knapsack.Knapsack.Item;
-import com.sattler.knapsack.KnapsackDataParser.KnapsackParameter;
+import net.sattler22.knapsack.Knapsack.Item;
+import net.sattler22.knapsack.KnapsackDataParser.KnapsackParameter;
 
 /**
  * Barclay's Programming Challenge 2018

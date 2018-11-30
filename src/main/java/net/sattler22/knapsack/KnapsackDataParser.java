@@ -1,4 +1,4 @@
-package com.sattler.knapsack;
+package net.sattler22.knapsack;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
-import com.sattler.knapsack.Knapsack.Item;
+import net.sattler22.knapsack.Knapsack.Item;
 
 /**
  * Knapsack Data Parser

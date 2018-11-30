@@ -1,8 +1,8 @@
-package com.sattler.knapsack;
+package net.sattler22.knapsack;
 
 import java.util.Arrays;
 
-import com.sattler.knapsack.Knapsack.Item;
+import net.sattler22.knapsack.Knapsack.Item;
 
 /**
  * Knapsack base packer implementation
