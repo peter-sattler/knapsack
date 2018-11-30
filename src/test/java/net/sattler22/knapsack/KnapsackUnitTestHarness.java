@@ -52,8 +52,14 @@ public final class KnapsackUnitTestHarness {
     private static final Class<?>[] KNAPSACK_PACKER_IMPLS = new Class[] { KnapsackWholeItemRecursivePackerImpl.class };
 
     @Test
-    public void knapsackWholeItemPackerWebsiteTestCase() {
-        final String unparsedData = "7 : (1,2,$1) (2,3,$2) (3,3,$5) (4,4,$9)";
+    public void knapsackWholeItemPackerGeeksForGeeksWebsiteTestCase() {
+        final String unparsedData = "10 : (1,2,$40) (2,3.14,$50) (3,1.98,$100) (4,5,$95) (5,3,$30)";
+        checkAssertionsImpl(unparsedData, new Integer[] { 1, 3, 4 });
+    }
+
+    @Test
+    public void knapsackWholeItemPackerTechiemeInWebsiteTestCase() {
+        final String unparsedData = "7 : (1,2,$1) (2,3,$2) (3,3,$5) (4,4,$9) (5,6,$4)";
         checkAssertionsImpl(unparsedData, new Integer[] { 3, 4 });
     }
 
