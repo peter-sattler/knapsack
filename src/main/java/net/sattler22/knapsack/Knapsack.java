@@ -75,6 +75,15 @@ public interface Knapsack {
             return cost;
         }
 
+        /**
+         * Get cost/weight ratio
+         * 
+         * @return The value per unit weight
+         */
+        public BigDecimal getCostWeightRatio() {
+            return new BigDecimal(cost).divide(weight);
+        }
+
         @Override
         public int hashCode() {
             return Objects.hash(id);
