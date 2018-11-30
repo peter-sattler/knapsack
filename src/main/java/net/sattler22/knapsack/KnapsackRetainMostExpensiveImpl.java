@@ -20,9 +20,8 @@ public final class KnapsackRetainMostExpensiveImpl implements Knapsack, Serializ
 
     private static final long serialVersionUID = 1219933700555470834L;
     private static final Logger LOGGER = LoggerFactory.getLogger(KnapsackRetainMostExpensiveImpl.class);
-    private static final Comparator<Item> LOWEST_COST_ITEM = Comparator.comparingInt(Item::getCost);
     private final BigDecimal capacity;
-    private final PriorityBlockingQueue<Item> items = new PriorityBlockingQueue<>(11, LOWEST_COST_ITEM);
+    private final PriorityBlockingQueue<Item> items = new PriorityBlockingQueue<>(11, Comparator.comparingInt(Item::getCost));
 
     /**
      * Constructs a new knapsack
