@@ -2,6 +2,7 @@ package net.sattler22.knapsack;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Objects;
 
 /**
