@@ -81,7 +81,7 @@ public interface Knapsack {
          * @return The value per unit weight
          */
         public BigDecimal getCostWeightRatio() {
-            return new BigDecimal(cost).divide(weight);
+            return new BigDecimal(cost).divide(weight, RoundingMode.HALF_UP);
         }
 
         @Override
