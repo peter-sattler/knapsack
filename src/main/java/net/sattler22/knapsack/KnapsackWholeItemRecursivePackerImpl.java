@@ -15,7 +15,8 @@ import net.sattler22.knapsack.Knapsack.Item;
  * <b>WARNING:</b> This algorithm suffers from quadratic performance due to massive
  * recomputation of overlapping subproblems
  * 
- * @see <a href="http://techieme.in/solving-01-knapsack-problem-using-recursion">Solving 0/1 Knapsack problem using Recursion</a>
+ * @see <a href="http://techieme.in/solving-01-knapsack-problem-using-recursion">
+ *         Solving 0/1 Knapsack problem using Recursion</a>
  * @author Pete Sattler
  * @version November 2018
  */

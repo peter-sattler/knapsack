@@ -21,14 +21,17 @@ import net.sattler22.knapsack.KnapsackDataParser.KnapsackParameter;
  * Barclay's Programming Challenge 2018
  * <ol>
  * <li>You want to send your friend a package with different things.</li>
- * <li>Each thing you put inside of a package has such parameters as index number, weight and cost.</li>
+ * <li>Each thing you put inside of a package has such parameters as index number, 
+ *     weight and cost.</li>
  * <li>The package has a weight limitation.</li>
  * </ol>
  * <p/>
- * Your goal is to determine which things to put into the package so that the total weight is less than or equal to the package
- * limit and the total cost is as large as possible.
+ * Your goal is to determine which things to put into the package so that the total 
+ * weight is less than or equal to the package limit and the total cost is as large 
+ * as possible.
  * <p/>
- * You would prefer to send a package which has less weight if there is more than one package with the same price.
+ * You would prefer to send a package which has less weight if there is more than 
+ * one package with the same price.
  * <p/>
  * This is a variation of the Knapsack problem.
  * <p/>
@@ -41,7 +44,8 @@ import net.sattler22.knapsack.KnapsackDataParser.KnapsackParameter;
  * <p/>
  * Output:
  * <p/>
- * For each set of things produce a list of things (their index numbers separated by comma) that you put into the package.
+ * For each set of things produce a list of things (their index numbers separated 
+ * by comma) that you put into the package.
  * 
  * @author Pete Sattler
  * @version November 2018
@@ -49,7 +53,8 @@ import net.sattler22.knapsack.KnapsackDataParser.KnapsackParameter;
 public final class KnapsackUnitTestHarness {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KnapsackUnitTestHarness.class);
-    private static final Class<?>[] KNAPSACK_PACKER_IMPLS = new Class[] { KnapsackWholeItemRecursivePackerImpl.class };
+    private static final Class<?>[] KNAPSACK_PACKER_IMPLS = 
+            new Class[] { KnapsackWholeItemRecursivePackerImpl.class, KnapsackWholeItemBranchAndBoundPackerImpl.class };
 
     @Test
     public void knapsackWholeItemPackerGeeksForGeeksWebsiteTestCase() {
