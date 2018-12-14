@@ -48,7 +48,7 @@ import net.sattler22.knapsack.KnapsackDataParser.KnapsackParameter;
  * by comma) that you put into the package.
  * 
  * @author Pete Sattler
- * @version November 2018
+ * @version December 2018
  */
 public final class KnapsackUnitTestHarness {
 
@@ -64,7 +64,7 @@ public final class KnapsackUnitTestHarness {
 
     @Test
     public void knapsackWholeItemPackerTechiemeInWebsiteTestCase() {
-        final String unparsedData = "7 : (1,2,$1) (2,3,$2) (3,3,$5) (4,4,$9) (5,6,$4)";
+        final String unparsedData = "7 : (1,2,$1) (2,3,$2) (3,3,$5) (4,4,$9)";
         checkAssertionsImpl(unparsedData, new Integer[] { 3, 4 });
     }
 
@@ -77,7 +77,7 @@ public final class KnapsackUnitTestHarness {
     @Test
     public void knapsackWholeItemPackerTwoMostExpensiveHaveDifferentWeightsTestCase() {
         final String unparsedData = "56 : (1,90.72,$13) (2,33.80,$40) (3,43.15,$10) (4,37.97,$16) (5,46.81,$36) (6,48.77,$79) (7,81.80,$45) (8,19.36,$79) (9,6.76,$64)";
-        checkAssertionsImpl(unparsedData, new Integer[] { 6 });
+        checkAssertionsImpl(unparsedData, new Integer[] { 8, 9 });
     }
 
     @Test
@@ -98,11 +98,11 @@ public final class KnapsackUnitTestHarness {
         final BigDecimal capacity = knapsackParameter.getCapacity();
         final Item[] items = knapsackParameter.getItems();
         for (Class<?> knapsackPackerImpl : KNAPSACK_PACKER_IMPLS) {
-            final Knapsack knapsack = new KnapsackRetainMostExpensiveImpl(capacity);
             try {
                 final Constructor<?> knapsackPackerCtor = knapsackPackerImpl.getDeclaredConstructor(new Class[] { Knapsack.class, Item[].class });
+                final Knapsack knapsack = new KnapsackDefaultImpl(capacity);
                 final KnapsackPacker knapsackPacker = (KnapsackPacker) knapsackPackerCtor.newInstance(knapsack, items);
-                final List<Integer> actual = executeKnapsackImpl(knapsack, items, knapsackPacker);
+                final List<Integer> actual = executeKnapsackImpl(capacity, items, knapsackPacker);
                 assertThat(actual, containsInAnyOrder(expected));
             }
             catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
