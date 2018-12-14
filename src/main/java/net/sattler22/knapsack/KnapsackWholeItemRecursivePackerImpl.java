@@ -18,7 +18,7 @@ import net.sattler22.knapsack.Knapsack.Item;
  * @see <a href="http://techieme.in/solving-01-knapsack-problem-using-recursion">
  *         Solving 0/1 Knapsack problem using Recursion</a>
  * @author Pete Sattler
- * @version November 2018
+ * @version December 2018
  */
 public final class KnapsackWholeItemRecursivePackerImpl extends KnapsackBasePackerImpl implements Serializable {
 
@@ -41,27 +41,36 @@ public final class KnapsackWholeItemRecursivePackerImpl extends KnapsackBasePack
     }
 
     private Item packImpl(int recursionLevel, int itemNbr, BigDecimal remainingCapacity, int totalCost) {
-        if (remainingCapacity == BigDecimal.ZERO || itemNbr == items.length) {
-            LOGGER.debug("RECURSION-LEVEL={}: End of recursion path, remaining capacity={}, total cost={}", recursionLevel, remainingCapacity, totalCost);
-            return Item.ZERO;
+        if (remainingCapacity.compareTo(BigDecimal.ZERO) == 0 || itemNbr == items.length) {
+            LOGGER.info("RECURSION-LEVEL-{}: End of recursion path, remaining capacity={}, total cost={}", recursionLevel, remainingCapacity, totalCost);
+            //return Item.ZERO;
+            return items[itemNbr - 1];
         }
         final Item currentItem = items[itemNbr];
-        LOGGER.debug("RECURSION-LEVEL={}: Considering {}", recursionLevel, currentItem);
+        LOGGER.info("RECURSION-LEVEL-{}: Considering {}, remaining capacity={}, total cost={}", recursionLevel, currentItem, remainingCapacity, totalCost);
         if (currentItem.getWeight().compareTo(remainingCapacity) > 0) {
-            LOGGER.debug("RECURSION-LEVEL={}: {} does not fit into the remaining capacity of {} lbs.", recursionLevel, currentItem, remainingCapacity);
+            //LOGGER.info("RECURSION-LEVEL-{}: {} does not fit into the remaining capacity of {} lbs.", recursionLevel, currentItem, remainingCapacity);
             return packImpl(++recursionLevel, itemNbr + 1, remainingCapacity, totalCost);
         }
-        //Either take the item or leave it:
-        //NOTE: The knapsack implementation itself handles retention of the most expensive item(s)
+
+        //Take the item:
+        final Item tookItem = packImpl(++recursionLevel, itemNbr + 1, remainingCapacity.subtract(currentItem.getWeight()), totalCost + currentItem.getCost());
+        //LOGGER.info("RECURSION-LEVEL-{}: TOOK {}", recursionLevel, tookItem);
+
+        //Leave the item:
         final Item leftItem = packImpl(++recursionLevel, itemNbr + 1, remainingCapacity, totalCost);
-        if (knapsack.add(currentItem)) {
-            LOGGER.debug("RECURSION-LEVEL={}: Current {} fits into the knapsack", recursionLevel, currentItem);
-            return currentItem;
-        }
-        if (knapsack.add(leftItem)) {
-            LOGGER.debug("RECURSION-LEVEL={}: Left {} fits into the knapsack", recursionLevel, leftItem);
-            return leftItem;
-        }
-        return Item.ZERO;
+        //LOGGER.info("RECURSION-LEVEL-{}: LEFT {}", recursionLevel, leftItem);
+
+        //final Item maxItem = max(tookItem, leftItem);
+        final Item maxItem = tookItem.getCost() > leftItem.getCost() ? tookItem : leftItem;
+
+        //LOGGER.info("RECURSION-LEVEL-{}: MAX {}", recursionLevel, maxItem);
+
+        knapsack.add(maxItem);
+        return maxItem;
+    }
+
+    private static Item max(Item item1, Item item2) {
+        return item1.getCost() > item2.getCost() ? item1 : item2;
     }
 }
