@@ -3,13 +3,14 @@ package net.sattler22.knapsack;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Comparator;
 import java.util.Objects;
 
 /**
  * A knapsack capable of holding immutable items
  * 
  * @author Pete Sattler
- * @version November 2018
+ * @version December 2018
  */
 public interface Knapsack {
 
@@ -23,7 +24,7 @@ public interface Knapsack {
     /**
      * Add a new item
      * 
-     * @param newItem The new item to add. If the knapsack doesn't have enough capacity, then 
+     * @param newItem The new item to add. If the knapsack doesn't have enough capacity, then
      *                one or more items will be removed according to the specific implementation.
      * @return True if the item was added to the knapsack. Otherwise, returns false.
      */
@@ -42,6 +43,7 @@ public interface Knapsack {
     final class Item implements Serializable {
 
         private static final long serialVersionUID = 5011062863033824403L;
+        public static final Comparator<Item> BY_COST_WEIGHT_RATIO_DESCENDING = Comparator.comparing(Item::getCostWeightRatio).reversed();
         private final int id;
         private final BigDecimal weight;
         private final int cost;
@@ -79,10 +81,12 @@ public interface Knapsack {
         /**
          * Get cost/weight ratio
          * 
-         * @return The value per unit weight
+         * @return The cost per unit of weight (9 digits of scale, rounded half up)
          */
         public BigDecimal getCostWeightRatio() {
-            return new BigDecimal(cost).divide(weight, RoundingMode.HALF_UP);
+            if (weight.compareTo(BigDecimal.ZERO) == 0)
+                return BigDecimal.ZERO;
+            return new BigDecimal(cost).divide(weight, 9, RoundingMode.HALF_UP);
         }
 
         @Override
@@ -104,7 +108,7 @@ public interface Knapsack {
 
         @Override
         public String toString() {
-            return String.format("%s [id=%s, weight=%s, cost=%s]", getClass().getSimpleName(), id, weight, cost);
+            return String.format("%s [id=%s, weight=%s, cost=%s, cost/weight=%s]", getClass().getSimpleName(), id, weight, cost, getCostWeightRatio());
         }
     }
 }
