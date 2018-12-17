@@ -48,10 +48,8 @@ public final class KnapsackWholeItemRecursivePackerImpl extends KnapsackBasePack
                 for (Item visitedItem : visited)
                     knapsack.add(visitedItem);
             }
-            if (!visited.isEmpty()) {
-                final Item removedItem = visited.pop();
-                LOGGER.info("Removed {}", removedItem);
-            }
+            if (!visited.isEmpty())
+                LOGGER.info("Removed {}", visited.pop());
             return Item.ZERO;
         }
         final Item currentItem = items[itemNbr];
