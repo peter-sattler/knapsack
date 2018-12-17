@@ -3,12 +3,11 @@ package net.sattler22.knapsack;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Comparator;
 import java.util.Objects;
 
 /**
  * A knapsack capable of holding immutable items
- * 
+ *
  * @author Pete Sattler
  * @version December 2018
  */
@@ -16,26 +15,45 @@ public interface Knapsack {
 
     /**
      * Get capacity
-     * 
+     *
      * @return The maximum weight (in pounds) that the knapsack can hold
      */
     BigDecimal getCapacity();
 
     /**
      * Add a new item
-     * 
-     * @param newItem The new item to add. If the knapsack doesn't have enough capacity, then
-     *                one or more items will be removed according to the specific implementation.
+     *
+     * @param newItem The new item to add. If the knapsack doesn't have enough capacity, then one or more items will be removed
+     *        according to the specific implementation.
      * @return True if the item was added to the knapsack. Otherwise, returns false.
      */
     boolean add(Item newItem);
 
     /**
      * Get items
-     * 
+     *
      * @return An array of all item IDs currently held in the knapsack
      */
     int[] getItems();
+
+    /**
+     * Get total weight
+     *
+     * @return The total weight (in pounds) of all items currently held in the knapsack
+     */
+    BigDecimal getTotalWeight();
+
+    /**
+     * Get total cost
+     *
+     * @return The total cost (in USD) of all items currently held in the knapsack
+     */
+    int getTotalCost();
+
+    /**
+     * Empty the knapsack of all items
+     */
+    void empty();
 
     /**
      * An immutable knapsack item
@@ -43,7 +61,7 @@ public interface Knapsack {
     final class Item implements Serializable {
 
         private static final long serialVersionUID = 5011062863033824403L;
-        public static final Comparator<Item> BY_COST_WEIGHT_RATIO_DESCENDING = Comparator.comparing(Item::getCostWeightRatio).reversed();
+        private static final int COST_WEIGHT_RATIO_SCALE = 9;
         private final int id;
         private final BigDecimal weight;
         private final int cost;
@@ -55,7 +73,7 @@ public interface Knapsack {
 
         /**
          * Constructs a new knapsack item
-         * 
+         *
          * @param id A unique identifier
          * @param weight The weight (in pounds)
          * @param cost The cost of the item (in USD)
@@ -80,13 +98,13 @@ public interface Knapsack {
 
         /**
          * Get cost/weight ratio
-         * 
+         *
          * @return The cost per unit of weight (9 digits of scale, rounded half up)
          */
         public BigDecimal getCostWeightRatio() {
             if (weight.compareTo(BigDecimal.ZERO) == 0)
                 return BigDecimal.ZERO;
-            return new BigDecimal(cost).divide(weight, 9, RoundingMode.HALF_UP);
+            return new BigDecimal(cost).divide(weight, COST_WEIGHT_RATIO_SCALE, RoundingMode.HALF_UP);
         }
 
         @Override

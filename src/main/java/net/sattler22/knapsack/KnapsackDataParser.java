@@ -4,7 +4,9 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -23,9 +25,11 @@ import net.sattler22.knapsack.Knapsack.Item;
  * <li>Its cost (in USD)</li>
  * </ol>
  * </ul>
- * 
+ * <b>LIMITATION:</b> Having multiple items with the same cost, but different weights may lead to different implementation specific
+ * solutions, so it is therefore considered unsupported due to this ambiguity.
+ *
  * @author Pete Sattler
- * @version November 2018
+ * @version December 2018
  */
 public final class KnapsackDataParser {
 
@@ -37,7 +41,7 @@ public final class KnapsackDataParser {
 
     /**
      * Constructs a new knapsack data parser
-     * 
+     *
      * @param unparsedData The unparsed data
      */
     public KnapsackDataParser(String unparsedData) {
@@ -46,7 +50,7 @@ public final class KnapsackDataParser {
 
     /**
      * Parse the data
-     * 
+     *
      * @return The knapsack's capacity and list of possible items to pack
      */
     public KnapsackParameter parse() {
@@ -57,7 +61,8 @@ public final class KnapsackDataParser {
     }
 
     private static KnapsackParameter parseItems(BigDecimal capacity, String unparsedItemData) {
-        List<Item> itemList = new ArrayList<>();
+        final List<Item> itemList = new ArrayList<>();
+        final Map<Integer, BigDecimal> itemsWithSameCostDiffWeights = new HashMap<>();
         final String[] items = ITEM_LIST_PATTERN.split(unparsedItemData);
         for (String item : items) {
             final String[] splitData = ITEM_COMPONENT_PATTERN.split(item.replaceAll(ITEM_LIST_REPLACEMENT_CHARS, ""));
@@ -65,8 +70,11 @@ public final class KnapsackDataParser {
                 throw new IllegalArgumentException("Item components have incorrect format");
             final int id = Integer.parseInt(splitData[0]);
             final BigDecimal weight = new BigDecimal(splitData[1]);
-            final int cost = Integer.parseInt(splitData[2]);
-            itemList.add(new Item(id, weight, cost));
+            final Integer cost = Integer.valueOf(splitData[2]);
+            if (itemsWithSameCostDiffWeights.containsKey(cost))
+                throw new IllegalStateException(String.format("Found multiple items which cost $%s, but have different weights which is an unsupported ambiguity", cost));
+            itemsWithSameCostDiffWeights.put(cost, weight);
+            itemList.add(new Item(id, weight, cost.intValue()));
         }
         return new KnapsackParameter(capacity, itemList);
     }

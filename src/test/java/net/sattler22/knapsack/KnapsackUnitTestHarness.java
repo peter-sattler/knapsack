@@ -21,17 +21,14 @@ import net.sattler22.knapsack.KnapsackDataParser.KnapsackParameter;
  * Barclay's Programming Challenge 2018
  * <ol>
  * <li>You want to send your friend a package with different things.</li>
- * <li>Each thing you put inside of a package has such parameters as index number, 
- *     weight and cost.</li>
+ * <li>Each thing you put inside of a package has such parameters as index number, weight and cost.</li>
  * <li>The package has a weight limitation.</li>
  * </ol>
  * <p/>
- * Your goal is to determine which things to put into the package so that the total 
- * weight is less than or equal to the package limit and the total cost is as large 
- * as possible.
+ * Your goal is to determine which things to put into the package so that the total weight is less than or equal to the package
+ * limit and the total cost is as large as possible.
  * <p/>
- * You would prefer to send a package which has less weight if there is more than 
- * one package with the same price.
+ * You would prefer to send a package which has less weight if there is more than one package with the same price.
  * <p/>
  * This is a variation of the Knapsack problem.
  * <p/>
@@ -44,17 +41,15 @@ import net.sattler22.knapsack.KnapsackDataParser.KnapsackParameter;
  * <p/>
  * Output:
  * <p/>
- * For each set of things produce a list of things (their index numbers separated 
- * by comma) that you put into the package.
- * 
+ * For each set of things produce a list of things (their index numbers separated by comma) that you put into the package.
+ *
  * @author Pete Sattler
  * @version December 2018
  */
 public final class KnapsackUnitTestHarness {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(KnapsackUnitTestHarness.class);
-    private static final Class<?>[] KNAPSACK_PACKER_IMPLS = 
-            new Class[] { KnapsackWholeItemRecursivePackerImpl.class, KnapsackWholeItemBranchAndBoundPackerImpl.class };
+    private static final Class<?>[] KNAPSACK_PACKER_IMPLS = new Class[] { KnapsackWholeItemRecursivePackerImpl.class, KnapsackWholeItemBranchAndBoundPackerImpl.class };
 
     @Test
     public void knapsackWholeItemPackerGeeksForGeeksWebsiteTestCase() {
@@ -74,10 +69,10 @@ public final class KnapsackUnitTestHarness {
         checkAssertionsImpl(unparsedData, new Integer[] {});
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
     public void knapsackWholeItemPackerTwoMostExpensiveHaveDifferentWeightsTestCase() {
         final String unparsedData = "56 : (1,90.72,$13) (2,33.80,$40) (3,43.15,$10) (4,37.97,$16) (5,46.81,$36) (6,48.77,$79) (7,81.80,$45) (8,19.36,$79) (9,6.76,$64)";
-        checkAssertionsImpl(unparsedData, new Integer[] { 8, 9 });
+        checkAssertionsImpl(unparsedData, null);
     }
 
     @Test
@@ -88,7 +83,7 @@ public final class KnapsackUnitTestHarness {
 
     @Test
     public void knapsackWholeItemPackerMultipleItemsTestCase() {
-        final String unparsedData = "75 : (1,85.31,$29) (2,14.55,$74) (3,3.98,$16) (4,26.24,$55) (5,63.69,$52) (6,76.25,$75) (7,60.02,$74) (8,93.18,$35) (9,89.95,$78)";
+        final String unparsedData = "75 : (1,85.31,$29) (2,14.55,$74) (3,3.98,$16) (4,26.24,$55) (5,63.69,$52) (6,76.25,$75) (7,60.02,$90) (8,93.18,$35) (9,89.95,$78)";
         checkAssertionsImpl(unparsedData, new Integer[] { 2, 7 });
     }
 
@@ -97,18 +92,16 @@ public final class KnapsackUnitTestHarness {
         final KnapsackParameter knapsackParameter = parser.parse();
         final BigDecimal capacity = knapsackParameter.getCapacity();
         final Item[] items = knapsackParameter.getItems();
-        for (Class<?> knapsackPackerImpl : KNAPSACK_PACKER_IMPLS) {
+        for (Class<?> knapsackPackerImpl : KNAPSACK_PACKER_IMPLS)
             try {
                 final Constructor<?> knapsackPackerCtor = knapsackPackerImpl.getDeclaredConstructor(new Class[] { Knapsack.class, Item[].class });
                 final Knapsack knapsack = new KnapsackDefaultImpl(capacity);
                 final KnapsackPacker knapsackPacker = (KnapsackPacker) knapsackPackerCtor.newInstance(knapsack, items);
-                final List<Integer> actual = executeKnapsackImpl(capacity, items, knapsackPacker);
+                final List<Integer> actual = executeKnapsackImpl(knapsack, items, knapsackPacker);
                 assertThat(actual, containsInAnyOrder(expected));
-            }
-            catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
                 throw new IllegalStateException(e);
             }
-        }
     }
 
     private static List<Integer> executeKnapsackImpl(Knapsack knapsack, Item[] items, KnapsackPacker knapsackPacker) {
