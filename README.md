@@ -9,7 +9,7 @@ I provide two different implementations, both are _whole item_ (0/1) solutions m
 
 Special thanks for these two articles which were a fundamental source of information for me.
 
-* [Solving 0/1 Knapsack problem using Recursion<](http://techieme.in/solving-01-knapsack-problem-using-recursion/) 
+* [Solving 0/1 Knapsack problem using Recursion](http://techieme.in/solving-01-knapsack-problem-using-recursion/) 
 * [Implementation of 0/1 Knapsack using Branch and Bound](https://www.geeksforgeeks.org/implementation-of-0-1-knapsack-using-branch-and-bound/)
 
 Pete Sattler  
