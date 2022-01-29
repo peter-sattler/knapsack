@@ -9,10 +9,11 @@ import java.util.Objects;
 /**
  * Knapsack base implementation
  *
+ * @implSpec All sub-classes are required to be thread-safe
  * @author Pete Sattler
  * @version December 2018
  */
-public abstract class KnapsackBaseImpl implements Knapsack {
+public abstract sealed class KnapsackBaseImpl implements Knapsack permits KnapsackDefaultImpl {
 
     protected final BigDecimal capacity;
     protected final Collection<Item> items;
@@ -29,13 +30,13 @@ public abstract class KnapsackBaseImpl implements Knapsack {
     }
 
     @Override
-    public BigDecimal getCapacity() {
+    public BigDecimal capacity() {
         return capacity;
     }
 
     @Override
     public boolean add(Item newItem) {
-        if (newItem.getWeight().compareTo(BigDecimal.ZERO) <= 0)
+        if (newItem.weight().compareTo(BigDecimal.ZERO) <= 0)
             return false;
         if (items.contains(newItem))
             return false;
@@ -51,23 +52,23 @@ public abstract class KnapsackBaseImpl implements Knapsack {
      * @return True if there is enough available capacity to fit the new item. Otherwise, returns false.
      */
     protected boolean hasEnoughCapacity(Item newItem) {
-        final BigDecimal usedCapacity = newItem.getWeight().add(getTotalWeight());
+        final var usedCapacity = newItem.weight().add(totalWeight());
         return usedCapacity.compareTo(capacity) <= 0;
     }
 
     @Override
-    public int[] getItems() {
-        return items.stream().mapToInt(Item::getId).toArray();
+    public int[] items() {
+        return items.stream().mapToInt(Item::id).toArray();
     }
 
     @Override
-    public BigDecimal getTotalWeight() {
-        return items.stream().map(Item::getWeight).reduce(BigDecimal.ZERO, BigDecimal::add);
+    public BigDecimal totalWeight() {
+        return items.stream().map(Item::weight).reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     @Override
-    public int getTotalCost() {
-        return items.stream().mapToInt(Item::getCost).sum();
+    public int totalCost() {
+        return items.stream().mapToInt(Item::cost).sum();
     }
 
     @Override
@@ -77,7 +78,7 @@ public abstract class KnapsackBaseImpl implements Knapsack {
 
     @Override
     public int hashCode() {
-        return Objects.hash(capacity, getItems());
+        return Objects.hashCode(capacity) + Arrays.hashCode(items());
     }
 
     @Override
@@ -88,8 +89,8 @@ public abstract class KnapsackBaseImpl implements Knapsack {
             return false;
         if (this.getClass() != other.getClass())
             return false;
-        final KnapsackBaseImpl that = (KnapsackBaseImpl) other;
-        return Objects.equals(this.capacity, that.capacity) && Arrays.equals(this.getItems(), that.getItems());
+        final var that = (KnapsackBaseImpl) other;
+        return Objects.equals(this.capacity, that.capacity) && Arrays.equals(this.items(), that.items());
     }
 
     @Override

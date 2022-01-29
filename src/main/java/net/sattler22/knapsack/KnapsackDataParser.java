@@ -1,15 +1,14 @@
 package net.sattler22.knapsack;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
+import net.jcip.annotations.Immutable;
 import net.sattler22.knapsack.Knapsack.Item;
 
 /**
@@ -21,7 +20,7 @@ import net.sattler22.knapsack.Knapsack.Item;
  * <li>The list of items you need to pick from. Each item is enclosed in parentheses where:
  * <ol>
  * <li>Item's unique identifier</li>
- * <li>Its weight (in lbs.)</li>
+ * <li>Its weight (in US pounds)</li>
  * <li>Its cost (in USD)</li>
  * </ol>
  * </ul>
@@ -31,6 +30,7 @@ import net.sattler22.knapsack.Knapsack.Item;
  * @author Pete Sattler
  * @version December 2018
  */
+@Immutable
 public final class KnapsackDataParser {
 
     private static final Pattern KNAPSACK_CAPACITY_PATTERN = Pattern.compile("\\s*:\\s*");
@@ -54,7 +54,7 @@ public final class KnapsackDataParser {
      * @return The knapsack's capacity and list of possible items to pack
      */
     public KnapsackParameter parse() {
-        final String[] splitData = KNAPSACK_CAPACITY_PATTERN.split(unparsedData);
+        final var splitData = KNAPSACK_CAPACITY_PATTERN.split(unparsedData);
         if (splitData.length != 2)
             throw new IllegalArgumentException("Input data has incorrect format");
         return parseItems(new BigDecimal(splitData[0]), splitData[1]);
@@ -62,43 +62,43 @@ public final class KnapsackDataParser {
 
     private static KnapsackParameter parseItems(BigDecimal capacity, String unparsedItemData) {
         final List<Item> itemList = new ArrayList<>();
-        final Map<Integer, BigDecimal> itemsWithSameCostDiffWeights = new HashMap<>();
-        final String[] items = ITEM_LIST_PATTERN.split(unparsedItemData);
-        for (String item : items) {
-            final String[] splitData = ITEM_COMPONENT_PATTERN.split(item.replaceAll(ITEM_LIST_REPLACEMENT_CHARS, ""));
+        final var itemsWithSameCostDiffWeights = new HashMap<>();
+        for (final var item : ITEM_LIST_PATTERN.split(unparsedItemData)) {
+            final var splitData = ITEM_COMPONENT_PATTERN.split(item.replaceAll(ITEM_LIST_REPLACEMENT_CHARS, ""));
             if (splitData.length != 3)
                 throw new IllegalArgumentException("Item components have incorrect format");
-            final int id = Integer.parseInt(splitData[0]);
-            final BigDecimal weight = new BigDecimal(splitData[1]);
-            final Integer cost = Integer.valueOf(splitData[2]);
+            final var id = Integer.parseInt(splitData[0]);
+            final var weight = new BigDecimal(splitData[1]);
+            final var cost = Integer.valueOf(splitData[2]);
             if (itemsWithSameCostDiffWeights.containsKey(cost))
                 throw new IllegalStateException(String.format("Found multiple items which cost $%s, but have different weights which is an unsupported ambiguity", cost));
             itemsWithSameCostDiffWeights.put(cost, weight);
             itemList.add(new Item(id, weight, cost.intValue()));
         }
-        return new KnapsackParameter(capacity, itemList);
+        final var itemArray = itemList.toArray(new Item[itemList.size()]);
+        return new KnapsackParameter(capacity, itemArray);
     }
 
     /**
-     * Represents an immutable knapsack parameter
+     * Knapsack parameter
      */
-    static final class KnapsackParameter implements Serializable {
+    static record KnapsackParameter(BigDecimal capacity, Item[] items) {
 
-        private static final long serialVersionUID = -3570309058766180832L;
-        private final BigDecimal capacity;
-        private final Item[] items;
-
-        public KnapsackParameter(BigDecimal capacity, List<Item> items) {
-            this.capacity = capacity;
-            this.items = items.toArray(new Item[items.size()]);
+        @Override
+        public int hashCode() {
+            return Objects.hashCode(capacity) + Arrays.hashCode(items);
         }
 
-        public BigDecimal getCapacity() {
-            return capacity;
-        }
-
-        public Item[] getItems() {
-            return Arrays.copyOf(items, items.length);
+        @Override
+        public boolean equals(Object other) {
+            if (this == other)
+                return true;
+            if (other == null)
+                return false;
+            if (this.getClass() != other.getClass())
+                return false;
+            final var that = (KnapsackParameter) other;
+            return Objects.equals(this.capacity, that.capacity) && Arrays.equals(this.items, that.items);
         }
 
         @Override

@@ -1,6 +1,5 @@
 package net.sattler22.knapsack;
 
-import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -13,6 +12,7 @@ import java.util.PriorityQueue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import net.jcip.annotations.Immutable;
 import net.sattler22.knapsack.Knapsack.Item;
 
 /**
@@ -41,11 +41,11 @@ import net.sattler22.knapsack.Knapsack.Item;
  * @author Pete Sattler
  * @version December 2018
  */
-public final class KnapsackWholeItemBranchAndBoundPackerImpl extends KnapsackBasePackerImpl implements Serializable {
+@Immutable
+public final class KnapsackPackerWholeItemBranchAndBoundImpl extends KnapsackPackerBaseImpl {
 
-    private static final long serialVersionUID = -2520636296982850885L;
-    private static final Logger LOGGER = LoggerFactory.getLogger(KnapsackWholeItemBranchAndBoundPackerImpl.class);
-    private static final Comparator<Item> BY_COST_WEIGHT_RATIO_DESCENDING = Comparator.comparing(Item::getCostWeightRatio).reversed();
+    private static final Logger logger = LoggerFactory.getLogger(KnapsackPackerWholeItemBranchAndBoundImpl.class);
+    private static final Comparator<Item> byCostWeightRatioDescending = Comparator.comparing(Item::calculateCostWeightRatio).reversed();
 
     /**
      * Constructs a new whole item branch and bound knapsack packer
@@ -53,57 +53,61 @@ public final class KnapsackWholeItemBranchAndBoundPackerImpl extends KnapsackBas
      * @param knapsack The knapsack to pack
      * @param items The items to pack
      */
-    public KnapsackWholeItemBranchAndBoundPackerImpl(Knapsack knapsack, Item[] items) {
+    public KnapsackPackerWholeItemBranchAndBoundImpl(Knapsack knapsack, Item[] items) {
         super(knapsack, items);
     }
 
     @Override
     public synchronized void pack() {
-        final BigDecimal capacity = knapsack.getCapacity();
-        final PriorityQueue<Node> queue = new PriorityQueue<>();
-        Node bestNode = new Node();
-        Node rootNode = new Node();
-        queue.offer(rootNode);
-        Arrays.sort(items, BY_COST_WEIGHT_RATIO_DESCENDING);
-        LOGGER.info("Sorted Items: {}", Arrays.toString(items));
+        final var queue = new PriorityQueue<Node>();
+        queue.offer(new Node());
+        Arrays.sort(items, byCostWeightRatioDescending);
+        if (logger.isInfoEnabled())
+            logger.info("Sorted Items: {}", Arrays.toString(items));
+        var bestNode = new Node();
         while (!queue.isEmpty()) {
-            Node currentNode = queue.poll();
-            LOGGER.info("Pulled from queue: {}", currentNode);
-            if (currentNode.bound >= bestNode.cost && currentNode.nextItem < items.length - 1) {
-                final Item currentItem = items[currentNode.nextItem];
-                LOGGER.info("*** Considering {}", currentItem);
-                // Take the item:
-                Node tookItemNode = new Node(currentNode).addWeight(currentItem.getWeight());
-                if (tookItemNode.weight.compareTo(capacity) <= 0) {
-                    tookItemNode.taken.add(currentItem);
-                    tookItemNode = tookItemNode.addCost(currentItem.getCost()).computeBound(capacity, items);
-                    if (tookItemNode.cost > bestNode.cost) {
-                        bestNode = tookItemNode;
-                        LOGGER.info("New Best {}", bestNode);
-                    }
-                    if (tookItemNode.bound > bestNode.cost) {
-                        LOGGER.info("Placing TOOK {} on queue", tookItemNode);
-                        queue.offer(tookItemNode);
-                    }
+            final var currentNode = queue.poll();
+            logger.info("Pulled from queue: {}", currentNode);
+            bestNode = processNode(queue, bestNode, currentNode);
+        }
+        //Add the best items to the knapsack:
+        bestNode.taken.forEach(knapsack::add);
+    }
+
+    private Node processNode(final PriorityQueue<Node> queue, Node bestNode, final Node currentNode) {
+        if (currentNode.bound >= bestNode.cost && currentNode.nextItem < items.length - 1) {
+            final var currentItem = items[currentNode.nextItem];
+            logger.info("*** Considering {}", currentItem);
+            //Take the item:
+            var tookItemNode = new Node(currentNode).addWeight(currentItem.weight());
+            if (tookItemNode.weight.compareTo(knapsack.capacity()) <= 0) {
+                tookItemNode.taken.add(currentItem);
+                tookItemNode = tookItemNode.addCost(currentItem.cost()).computeBound(knapsack.capacity(), items);
+                if (tookItemNode.cost > bestNode.cost) {
+                    bestNode = tookItemNode;
+                    logger.info("New Best {}", bestNode);
                 }
-                // Leave the item:
-                final Node leftItemNode = new Node(currentNode).computeBound(capacity, items);
-                if (leftItemNode.bound > bestNode.cost) {
-                    LOGGER.info("Placing LEFT {} on queue", leftItemNode);
-                    queue.offer(leftItemNode);
+                if (tookItemNode.bound > bestNode.cost) {
+                    logger.info("Placing TOOK {} on queue", tookItemNode);
+                    queue.offer(tookItemNode);
                 }
             }
+            //Leave the item:
+            final var leftItemNode = new Node(currentNode).computeBound(knapsack.capacity(), items);
+            if (leftItemNode.bound > bestNode.cost) {
+                logger.info("Placing LEFT {} on queue", leftItemNode);
+                queue.offer(leftItemNode);
+            }
         }
-        // Add the best items to the knapsack:
-        bestNode.taken.forEach(bestItem -> knapsack.add(bestItem));
+        return bestNode;
     }
 
     /**
-     * An immutable decision tree node
+     * Decision tree node
      */
-    static class Node implements Comparable<Node>, Serializable {
+    @Immutable
+    static class Node implements Comparable<Node> {
 
-        private static final long serialVersionUID = -6606469639279557400L;
         private final int nextItem;
         private final List<Item> taken;
         private final BigDecimal weight;
@@ -163,25 +167,42 @@ public final class KnapsackWholeItemBranchAndBoundPackerImpl extends KnapsackBas
          * @return The upper bound of the node
          */
         public Node computeBound(BigDecimal capacity, Item[] items) {
-            int itemNbr = nextItem;
-            BigDecimal totalWeight = weight;
-            int bound = cost;
+            var itemNbr = nextItem;
+            var totalWeight = weight;
+            var upperBound = cost;
             Item currentItem;
             do {
                 currentItem = items[itemNbr];
-                if (currentItem.getWeight().add(totalWeight).compareTo(capacity) > 0)
+                if (currentItem.weight().add(totalWeight).compareTo(capacity) > 0)
                     break;
-                totalWeight = currentItem.getWeight().add(totalWeight);
-                bound += currentItem.getCost();
+                totalWeight = currentItem.weight().add(totalWeight);
+                upperBound += currentItem.cost();
                 itemNbr++;
             } while (itemNbr < items.length);
-            bound += capacity.subtract(totalWeight).multiply(currentItem.getCostWeightRatio()).setScale(0, RoundingMode.HALF_UP).intValue();
-            return new Node(nextItem, taken, weight, cost, bound);
+            upperBound += capacity.subtract(totalWeight).multiply(currentItem.calculateCostWeightRatio()).setScale(0, RoundingMode.HALF_UP).intValue();
+            return new Node(nextItem, taken, weight, cost, upperBound);
         }
 
         @Override
         public int compareTo(Node that) {
             return that.bound - this.bound;
+        }
+
+        @Override
+        public int hashCode() {
+            return bound;
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (this == other)
+                return true;
+            if (other == null)
+                return false;
+            if (this.getClass() != other.getClass())
+                return false;
+            final var that = (Node) other;
+            return this.bound == that.bound;
         }
 
         @Override
