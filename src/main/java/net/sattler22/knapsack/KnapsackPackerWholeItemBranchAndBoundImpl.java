@@ -117,7 +117,7 @@ public final class KnapsackPackerWholeItemBranchAndBoundImpl extends KnapsackPac
         /**
          * Constructs a new, empty decision tree node
          */
-        public Node() {
+        Node() {
             this(0, new ArrayList<>(), BigDecimal.ZERO, 0, 0);
         }
 
@@ -143,7 +143,7 @@ public final class KnapsackPackerWholeItemBranchAndBoundImpl extends KnapsackPac
          *
          * @param parent The parent node
          */
-        public Node(Node parent) {
+        Node(Node parent) {
             this.nextItem = parent.nextItem + 1;
             this.taken = new ArrayList<>(parent.taken);
             this.weight = parent.weight;
@@ -151,11 +151,11 @@ public final class KnapsackPackerWholeItemBranchAndBoundImpl extends KnapsackPac
             this.bound = parent.bound;
         }
 
-        public Node addWeight(BigDecimal additionalWeight) {
+        Node addWeight(BigDecimal additionalWeight) {
             return new Node(nextItem, taken, weight.add(additionalWeight), cost, bound);
         }
 
-        public Node addCost(int additionalCost) {
+        Node addCost(int additionalCost) {
             return new Node(nextItem, taken, weight, cost + additionalCost, bound);
         }
 
@@ -166,7 +166,7 @@ public final class KnapsackPackerWholeItemBranchAndBoundImpl extends KnapsackPac
          * @param items The items to pack
          * @return The upper bound of the node
          */
-        public Node computeBound(BigDecimal capacity, Item[] items) {
+        Node computeBound(BigDecimal capacity, Item[] items) {
             var itemNbr = nextItem;
             var totalWeight = weight;
             var upperBound = cost;
