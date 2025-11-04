@@ -52,7 +52,7 @@ public abstract sealed class KnapsackBaseImpl implements Knapsack permits Knapsa
      * @return True if there is enough available capacity to fit the new item. Otherwise, returns false.
      */
     protected boolean hasEnoughCapacity(Item newItem) {
-        final var usedCapacity = newItem.weight().add(totalWeight());
+        final BigDecimal usedCapacity = newItem.weight().add(totalWeight());
         return usedCapacity.compareTo(capacity) <= 0;
     }
 
@@ -89,7 +89,7 @@ public abstract sealed class KnapsackBaseImpl implements Knapsack permits Knapsa
             return false;
         if (this.getClass() != other.getClass())
             return false;
-        final var that = (KnapsackBaseImpl) other;
+        final KnapsackBaseImpl that = (KnapsackBaseImpl) other;
         return Objects.equals(this.capacity, that.capacity) && Arrays.equals(this.items(), that.items());
     }
 

@@ -1,13 +1,13 @@
 package net.sattler22.knapsack;
 
-import java.util.Arrays;
-
 import net.sattler22.knapsack.Knapsack.Item;
+
+import java.util.Arrays;
 
 /**
  * Knapsack packer base implementation
  *
- * @implSpec All sub-classes are required to be thread-safe
+ * @implSpec All subclasses are required to be thread-safe
  * @author Pete Sattler
  * @version November 2018
  */

@@ -1,5 +1,10 @@
 package net.sattler22.knapsack;
 
+import net.jcip.annotations.Immutable;
+import net.sattler22.knapsack.Knapsack.Item;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -8,12 +13,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.PriorityQueue;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import net.jcip.annotations.Immutable;
-import net.sattler22.knapsack.Knapsack.Item;
 
 /**
  * Knapsack whole item packer implemented using branch and bound. It does not allow fractional items to be packed. That is, an item
@@ -30,7 +29,7 @@ import net.sattler22.knapsack.Knapsack.Item;
  * <p/>
  * The backtracking based solution works better than brute force by ignoring infeasible solutions. We can do better than
  * backtracking if we know a bound on best possible solution subtree rooted with every node. If the best in subtree is worse than
- * current best, we can simply ignore this node and its subtrees. So we compute bound (best solution) for every node and compare the
+ * current best, we can simply ignore this node and its subtrees. So we compute bound (the best solution) for every node and compare the
  * bound with current best solution before exploring the node.
  * <p/>
  * Branch and bound is very useful technique for searching a solution but in worst case, we need to fully calculate the entire tree.
@@ -45,7 +44,8 @@ import net.sattler22.knapsack.Knapsack.Item;
 public final class KnapsackPackerWholeItemBranchAndBoundImpl extends KnapsackPackerBaseImpl {
 
     private static final Logger logger = LoggerFactory.getLogger(KnapsackPackerWholeItemBranchAndBoundImpl.class);
-    private static final Comparator<Item> byCostWeightRatioDescending = Comparator.comparing(Item::calculateCostWeightRatio).reversed();
+    private static final Comparator<Item> byCostWeightRatioDescending =
+            Comparator.comparing(Item::calculateCostWeightRatio).reversed();
 
     /**
      * Constructs a new whole item branch and bound knapsack packer
@@ -59,14 +59,14 @@ public final class KnapsackPackerWholeItemBranchAndBoundImpl extends KnapsackPac
 
     @Override
     public synchronized void pack() {
-        final var queue = new PriorityQueue<Node>();
+        final PriorityQueue<Node> queue = new PriorityQueue<>();
         queue.offer(new Node());
         Arrays.sort(items, byCostWeightRatioDescending);
         if (logger.isInfoEnabled())
             logger.info("Sorted Items: {}", Arrays.toString(items));
-        var bestNode = new Node();
+        Node bestNode = new Node();
         while (!queue.isEmpty()) {
-            final var currentNode = queue.poll();
+            final Node currentNode = queue.poll();
             logger.info("Pulled from queue: {}", currentNode);
             bestNode = processNode(queue, bestNode, currentNode);
         }
@@ -76,10 +76,10 @@ public final class KnapsackPackerWholeItemBranchAndBoundImpl extends KnapsackPac
 
     private Node processNode(final PriorityQueue<Node> queue, Node bestNode, final Node currentNode) {
         if (currentNode.bound >= bestNode.cost && currentNode.nextItem < items.length - 1) {
-            final var currentItem = items[currentNode.nextItem];
+            final Item currentItem = items[currentNode.nextItem];
             logger.info("*** Considering {}", currentItem);
             //Take the item:
-            var tookItemNode = new Node(currentNode).addWeight(currentItem.weight());
+            Node tookItemNode = new Node(currentNode).addWeight(currentItem.weight());
             if (tookItemNode.weight.compareTo(knapsack.capacity()) <= 0) {
                 tookItemNode.taken.add(currentItem);
                 tookItemNode = tookItemNode.addCost(currentItem.cost()).computeBound(knapsack.capacity(), items);
@@ -93,7 +93,7 @@ public final class KnapsackPackerWholeItemBranchAndBoundImpl extends KnapsackPac
                 }
             }
             //Leave the item:
-            final var leftItemNode = new Node(currentNode).computeBound(knapsack.capacity(), items);
+            final Node leftItemNode = new Node(currentNode).computeBound(knapsack.capacity(), items);
             if (leftItemNode.bound > bestNode.cost) {
                 logger.info("Placing LEFT {} on queue", leftItemNode);
                 queue.offer(leftItemNode);
@@ -167,9 +167,9 @@ public final class KnapsackPackerWholeItemBranchAndBoundImpl extends KnapsackPac
          * @return The upper bound of the node
          */
         Node computeBound(BigDecimal capacity, Item[] items) {
-            var itemNbr = nextItem;
-            var totalWeight = weight;
-            var upperBound = cost;
+            int itemNbr = nextItem;
+            BigDecimal totalWeight = weight;
+            int upperBound = cost;
             Item currentItem;
             do {
                 currentItem = items[itemNbr];
@@ -179,7 +179,10 @@ public final class KnapsackPackerWholeItemBranchAndBoundImpl extends KnapsackPac
                 upperBound += currentItem.cost();
                 itemNbr++;
             } while (itemNbr < items.length);
-            upperBound += capacity.subtract(totalWeight).multiply(currentItem.calculateCostWeightRatio()).setScale(0, RoundingMode.HALF_UP).intValue();
+            upperBound += capacity.subtract(totalWeight)
+                    .multiply(currentItem.calculateCostWeightRatio())
+                    .setScale(0, RoundingMode.HALF_UP)
+                    .intValue();
             return new Node(nextItem, taken, weight, cost, upperBound);
         }
 
@@ -201,13 +204,14 @@ public final class KnapsackPackerWholeItemBranchAndBoundImpl extends KnapsackPac
                 return false;
             if (this.getClass() != other.getClass())
                 return false;
-            final var that = (Node) other;
+            final Node that = (Node) other;
             return this.bound == that.bound;
         }
 
         @Override
         public String toString() {
-            return String.format("%s [nextItem=%s, taken=%s, weight=%s, cost=%s, bound=%s]", getClass().getSimpleName(), nextItem, taken, weight, cost, bound);
+            return String.format("%s [nextItem=%s, taken=%s, weight=%s, cost=%s, bound=%s]",
+                    getClass().getSimpleName(), nextItem, taken, weight, cost, bound);
         }
     }
 }

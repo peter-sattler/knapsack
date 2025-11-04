@@ -1,15 +1,16 @@
 package net.sattler22.knapsack;
 
+import net.jcip.annotations.Immutable;
+import net.sattler22.knapsack.Knapsack.Item;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
-
-import net.jcip.annotations.Immutable;
-import net.sattler22.knapsack.Knapsack.Item;
 
 /**
  * Knapsack Data Parser
@@ -54,7 +55,7 @@ public final class KnapsackDataParser {
      * @return The knapsack's capacity and list of possible items to pack
      */
     public KnapsackParameter parse() {
-        final var splitData = KNAPSACK_CAPACITY_PATTERN.split(unparsedData);
+        final String[] splitData = KNAPSACK_CAPACITY_PATTERN.split(unparsedData);
         if (splitData.length != 2)
             throw new IllegalArgumentException("Input data has incorrect format");
         return parseItems(new BigDecimal(splitData[0]), splitData[1]);
@@ -62,27 +63,27 @@ public final class KnapsackDataParser {
 
     private static KnapsackParameter parseItems(BigDecimal capacity, String unparsedItemData) {
         final List<Item> itemList = new ArrayList<>();
-        final var itemsWithSameCostDiffWeights = new HashMap<>();
-        for (final var item : ITEM_LIST_PATTERN.split(unparsedItemData)) {
-            final var splitData = ITEM_COMPONENT_PATTERN.split(item.replaceAll(ITEM_LIST_REPLACEMENT_CHARS, ""));
+        final Map<Integer, BigDecimal> itemsWithSameCostDiffWeights = new HashMap<>();
+        for (final String item : ITEM_LIST_PATTERN.split(unparsedItemData)) {
+            final String[] splitData = ITEM_COMPONENT_PATTERN.split(item.replaceAll(ITEM_LIST_REPLACEMENT_CHARS, ""));
             if (splitData.length != 3)
                 throw new IllegalArgumentException("Item components have incorrect format");
-            final var id = Integer.parseInt(splitData[0]);
-            final var weight = new BigDecimal(splitData[1]);
-            final var cost = Integer.valueOf(splitData[2]);
+            final int id = Integer.parseInt(splitData[0]);
+            final BigDecimal weight = new BigDecimal(splitData[1]);
+            final Integer cost = Integer.valueOf(splitData[2]);
             if (itemsWithSameCostDiffWeights.containsKey(cost))
                 throw new IllegalStateException(String.format("Found multiple items which cost $%s, but have different weights which is an unsupported ambiguity", cost));
             itemsWithSameCostDiffWeights.put(cost, weight);
-            itemList.add(new Item(id, weight, cost.intValue()));
+            itemList.add(new Item(id, weight, cost));
         }
-        final var itemArray = itemList.toArray(new Item[itemList.size()]);
+        final Item[] itemArray = itemList.toArray(new Item[0]);
         return new KnapsackParameter(capacity, itemArray);
     }
 
     /**
      * Knapsack parameter
      */
-    static record KnapsackParameter(BigDecimal capacity, Item[] items) {
+    record KnapsackParameter(BigDecimal capacity, Item[] items) {
 
         @Override
         public int hashCode() {
@@ -97,7 +98,7 @@ public final class KnapsackDataParser {
                 return false;
             if (this.getClass() != other.getClass())
                 return false;
-            final var that = (KnapsackParameter) other;
+            final KnapsackParameter that = (KnapsackParameter) other;
             return Objects.equals(this.capacity, that.capacity) && Arrays.equals(this.items, that.items);
         }
 

@@ -1,12 +1,11 @@
 package net.sattler22.knapsack;
 
-import java.math.BigDecimal;
-import java.util.ArrayList;
-
+import net.jcip.annotations.Immutable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.jcip.annotations.Immutable;
+import java.math.BigDecimal;
+import java.util.ArrayList;
 
 /**
  * A knapsack which retains items as long as there is enough room

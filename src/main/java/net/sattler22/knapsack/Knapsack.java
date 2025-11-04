@@ -56,7 +56,7 @@ public sealed interface Knapsack permits KnapsackBaseImpl {
     /**
      * Knapsack item
      */
-    static record Item(int id, BigDecimal weight, int cost) {
+    record Item(int id, BigDecimal weight, int cost) {
 
         private static final int COST_WEIGHT_RATIO_SCALE = 9;
 

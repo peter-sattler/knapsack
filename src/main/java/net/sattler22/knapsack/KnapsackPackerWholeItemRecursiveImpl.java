@@ -1,14 +1,13 @@
 package net.sattler22.knapsack;
 
-import java.math.BigDecimal;
-import java.util.ArrayDeque;
-import java.util.Deque;
-
+import net.jcip.annotations.Immutable;
+import net.sattler22.knapsack.Knapsack.Item;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import net.jcip.annotations.Immutable;
-import net.sattler22.knapsack.Knapsack.Item;
+import java.math.BigDecimal;
+import java.util.ArrayDeque;
+import java.util.Deque;
 
 /**
  * Knapsack whole item packer implemented using simple, naive recursion. It does not allow fractional items to be packed. That is,
@@ -42,27 +41,31 @@ public final class KnapsackPackerWholeItemRecursiveImpl extends KnapsackPackerBa
 
     private Item packImpl(int recursionLevel, int itemNbr, BigDecimal remainingCapacity, int totalCost, Deque<Item> visited) {
         if (remainingCapacity.compareTo(BigDecimal.ZERO) == 0 || itemNbr == items.length) {
-            logger.info("RECURSION-LEVEL-{}: End of recursion path, remaining capacity={}, total cost={}, visited: {}", recursionLevel, remainingCapacity, totalCost, visited);
+            logger.info("RECURSION-LEVEL-{}: End of recursion path, remaining capacity={}, total cost={}, visited: {}",
+                    recursionLevel, remainingCapacity, totalCost, visited);
             if (totalCost > knapsack.totalCost()) {
                 logger.info("Repacking knapsack with visited items of higher cost");
                 knapsack.empty();
-                for (final var visitedItem : visited)
+                for (final Item visitedItem : visited)
                     knapsack.add(visitedItem);
             }
             if (!visited.isEmpty())
                 logger.info("Removed {}", visited.pop());
             return Item.ZERO;
         }
-        final var currentItem = items[itemNbr];
+        final Item currentItem = items[itemNbr];
         visited.push(currentItem);
-        logger.info("RECURSION-LEVEL-{}: *** Considering {}, remaining capacity={}, total cost={}", recursionLevel, currentItem, remainingCapacity, totalCost);
+        logger.info("RECURSION-LEVEL-{}: *** Considering {}, remaining capacity={}, total cost={}",
+                recursionLevel, currentItem, remainingCapacity, totalCost);
         if (currentItem.weight().compareTo(remainingCapacity) > 0) {
-            logger.info("RECURSION-LEVEL-{}: {} does not fit into the remaining capacity of {} lbs.", recursionLevel, currentItem, remainingCapacity);
+            logger.info("RECURSION-LEVEL-{}: {} does not fit into the remaining capacity of {} lbs.",
+                    recursionLevel, currentItem, remainingCapacity);
             logger.info("Removed {}", visited.pop());
             return packImpl(++recursionLevel, itemNbr + 1, remainingCapacity, totalCost, visited);
         }
-        final var takeTheItem = packImpl(++recursionLevel, itemNbr + 1, remainingCapacity.subtract(currentItem.weight()), totalCost + currentItem.cost(), visited);
-        final var leaveTheItem = packImpl(++recursionLevel, itemNbr + 1, remainingCapacity, totalCost, visited);
+        final Item takeTheItem =
+                packImpl(++recursionLevel, itemNbr + 1, remainingCapacity.subtract(currentItem.weight()), totalCost + currentItem.cost(), visited);
+        final Item leaveTheItem = packImpl(++recursionLevel, itemNbr + 1, remainingCapacity, totalCost, visited);
         if (takeTheItem.cost() >= leaveTheItem.cost()) {
             logger.info("RECURSION-LEVEL-{}: TOOK: {}", recursionLevel, takeTheItem);
             return takeTheItem;
