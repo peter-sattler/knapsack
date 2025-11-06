@@ -1,17 +1,33 @@
-# Classic Knapsack Problem
+# [It's the Knapsack Problem, Stupid](https://en.wikipedia.org/wiki/It's_the_economy,_stupid)
 
-The Knapsack Problem is a well known problem of combinatorial optimization. Given a set of items, each with a weight and a cost, we must determine the number of each item to include in a collection so that the total weight is less than or equal to a given limit and the total value must be maximized.
+You want to send your friend a package with different items. Each item you include has an associated identifier (ID), 
+cost and weight. The package has an overall capacity limitation. Your goal is to determine which items to place in the 
+package, so that its total weight does not exceed its capacity and its total cost is as large as possible. You would 
+prefer to send a package which has less weight if there is more than one package with the same price.
 
-I provide two different implementations, both are _whole item_ (0/1) solutions meaning fractional items are not allowed. An item is either packed or it is left out.
+## Constraints
 
-* _Recursive_ - uses simple, naive recursion with no memoization optimization.
-* _Branch and Bound_ - We can use Backtracking to optimize the Brute Force solution. In the tree representation, we can do DFS of tree. If we reach a point where a solution no longer is feasible, there is no need to continue exploring.
+* There are up to 15 available items to choose from.
+* The maximum capacity any package can hold is 100 lbs.
+* The maximum cost of any item is $100.00 (USD).
 
-Special thanks for these two articles which were a fundamental source of information for me.
+## Output 
 
-* [Solving 0/1 Knapsack problem using Recursion](http://techieme.in/solving-01-knapsack-problem-using-recursion/) 
-* [Implementation of 0/1 Knapsack using Branch and Bound](https://www.geeksforgeeks.org/implementation-of-0-1-knapsack-using-branch-and-bound/)
+For each set of items in inventory, produce a package with zero or more items that you will send to your friend.
+
+## Version History
+
+### [Version 1.0.0] Initial Release
+* Started life as Barclay's Programming Challenge 2018
+* Included both <i>Recursive</i> and <i>Branch and Bound</i> implementations
+* December 2018: Initial release (Gradle)
+* February 2022: Upgraded to Java 17 (Maven)
+
+### [Version 2.0.0] November 2025
+* Overhauled the entire project
+* Recursive implementation only
+* Upgraded to Java 24
 
 Pete Sattler  
-December 2018  
+November 2025  
 _peter@sattler22.net_

@@ -1,0 +1,13 @@
+{
+  "name": "Tara Dactyl",
+  "original": "8 : (1,15.3,$34)",
+  "capacity": 8,
+  "items": [
+    {
+      "id": 1,
+      "cost": 34.00,
+      "weight": 15.30
+    }
+  ],
+  "solution": []
+}

@@ -1,0 +1,28 @@
+{
+  "name": "Chick N. Nugget",
+  "original": "7 : (1,2,$1) (2,3,$2) (*3,3,$5) (*4,4,$9)",
+  "capacity": 7,
+  "items": [
+    {
+      "id": 1,
+      "cost": 1.00,
+      "weight": 2.00
+    },
+    {
+      "id": 2,
+      "cost": 2.00,
+      "weight": 3.00
+    },
+    {
+      "id": 3,
+      "cost": 5.00,
+      "weight": 3.00
+    },
+    {
+      "id": 4,
+      "cost": 9.00,
+      "weight": 4.00
+    }
+  ],
+  "solution": [3, 4]
+}
