@@ -9,8 +9,8 @@ import org.hamcrest.collection.IsIterableContainingInAnyOrder;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.ObjectReader;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -26,7 +26,7 @@ import java.util.List;
 final class WholeItemRecursivePackerTest {
 
     private static final Logger logger = LoggerFactory.getLogger(WholeItemRecursivePackerTest.class);
-    private static final ObjectReader objectReader = new ObjectMapper().readerFor(TestData.class);
+    private static final ObjectReader jsonReader = new JsonMapper().readerFor(TestData.class);
 
     @Test
     void pack_whenTwoItemsFitExactly_thenReturnThem() {
@@ -61,7 +61,7 @@ final class WholeItemRecursivePackerTest {
     private static void packAssert(String resource) {
         final TestData testData;
         try {
-            testData = objectReader.readValue(FileTestUtils.readResourceAsString(resource));
+            testData = jsonReader.readValue(FileTestUtils.readResourceAsString(resource));
         }
         catch (IOException | URISyntaxException exception) {
             throw new IllegalStateException(exception);
