@@ -3,7 +3,7 @@ package net.sattler22.knapsack.core;
 import net.sattler22.knapsack.model.Package;
 
 /**
- * A <code>Packer</code> selects zero or more items from inventory and adds them to the target package considering
+ * A {@code Packer} selects zero or more items from inventory and adds them to the target package considering
  * cost, weight and overall capacity
  *
  * @author Pete Sattler

@@ -20,7 +20,7 @@ public final class FileTestUtils {
     }
 
     /**
-     * Read a resource as a <code>String</code>
+     * Read a resource as a {@code String}
      *
      * @param path The resource's relative path
      * @return The resource contents

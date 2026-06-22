@@ -3,10 +3,10 @@
     <artifactId>knapsack</artifactId>
     <groupId>net.sattler22.knapsack</groupId>
     <modelVersion>4.0.0</modelVersion>
-    <version>2.0.0</version>
+    <version>2.1.0</version>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>24</java.version>
+        <java.version>25</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <junit.version>6.1.0</junit.version>

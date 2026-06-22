@@ -28,6 +28,9 @@ For each set of items in inventory, produce a package with zero or more items th
 * Recursive implementation only
 * Upgraded to Java 24
 
+### [Version 2.1.0] June 2026
+* Upgraded to Java 25
+
 Pete Sattler  
-November 2025  
+June 2026  
 _peter@sattler22.net_

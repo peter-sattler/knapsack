@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * The <code>Inventory</code> contains all available items for purchase
+ * The {@code Inventory} contains all available items for purchase
  *
  * @author Pete Sattler
  * @version November 2025
@@ -14,7 +14,7 @@ public record Inventory(List<Item> items) {
     private static final int MAX_ITEMS = 15;
 
     /**
-     * Constructs a new <code>Inventory</</code>
+     * Constructs a new {@code Inventory}
      *
      * @param items One or more items to add
      */

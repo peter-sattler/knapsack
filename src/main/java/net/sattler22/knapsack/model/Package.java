@@ -8,11 +8,11 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * A <code>Package</code> holds zero or more purchased items
+ * A {@code Package} holds zero or more purchased items
  *
  * @author Pete Sattler
  * @since December 2018
- * @version November 2025
+ * @version June 2026
  */
 @ThreadSafe
 public final class Package {
@@ -22,7 +22,7 @@ public final class Package {
     private final List<Item> items = Collections.synchronizedList(new ArrayList<>());
 
     /**
-     * Constructs a new <code>Package</code>
+     * Constructs a new {@code Package}
      *
      * @param capacity The maximum weight (in pounds) that the package can hold
      */
@@ -114,11 +114,8 @@ public final class Package {
     public boolean equals(Object other) {
         if (this == other)
             return true;
-        if (other == null)
+        if (!(other instanceof Package that))
             return false;
-        if (this.getClass() != other.getClass())
-            return false;
-        final Package that = (Package) other;
         return this.capacity.equals(that.capacity) && this.items.equals(that.items);
     }
 
